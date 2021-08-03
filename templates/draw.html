@@ -1,0 +1,60 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Drawing App</title>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.js"></script>
+
+</head>
+    <header>
+     Drawing App
+
+    </header>
+
+<body>
+    <img id="pred" src="static/prediction.png" width="200" height="200"/>
+
+   <form id = "myForm" action="{{ url_for('predict')}}" method="POST" >
+       <canvas id='latent_explorer' width="200" height="200" style="background-color: black"></canvas>
+        <script type="text/javascript">
+            function refresh(){
+            var image = document.getElementById("pred");
+
+            // Adding the timestamp parameter to image src
+            image.src = "static/prediction.png?t=" + new Date().getTime();
+            console.log(image.src);
+            };
+
+            function getMousePosition(canvas, event) {
+                let rect = canvas.getBoundingClientRect();
+                let x = event.clientX - rect.left;
+                let y = event.clientY - rect.top;
+                console.log("Coordinate x: " + x,
+                            "Coordinate y: " + y);
+
+                var postData = {
+                  "x":x,
+                  "y":y
+                }
+
+                $.ajax({
+                    url: "/predict",
+                    type: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify(postData),
+                    success: function(data){console.log('ok')}
+                });
+            }
+
+            let canvasElem = document.querySelector("#latent_explorer");
+
+            canvasElem.addEventListener("mousedown", function(e)
+            {
+                getMousePosition(canvasElem, e);
+                refresh(e);
+            });
+        </script>
+   </form>
+
+    </body>
+</html>
